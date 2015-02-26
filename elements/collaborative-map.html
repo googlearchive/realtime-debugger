@@ -1,0 +1,132 @@
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="../components/core-icons/image-icons.html">
+<link rel="import" href="../components/paper-input/paper-input.html">
+<link rel="import" href="base-collaborative-element.html">
+<link rel="import" href="collaborative-map-item.html">
+
+<polymer-element
+    name="collaborative-map"
+    attributes="value parent newKey"
+    extends="base-collaborative-element">
+  <template>
+    <shadow></shadow>
+    <div id="content" hidden?="{{ contentHidden }}">
+      <div id="mapItems"></div>
+      <div id="add" hidden?="{{ !globals.documentHolder.isEditable }}">
+        <core-icon
+          class="add-item {{ isClosed ? '' : 'close' }}"
+          on-click="{{ toggleAdd }}"
+          icon="add">
+        </core-icon>
+        <div class="key" hidden?="{{ isClosed }}">
+          <paper-input
+            label="new key"
+            id="newKey"
+            value="{{ newKey }}">
+          </paper-input>
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      ready: function() {
+        this.super();
+        this.elementName = 'Collaborative Map';
+        this.pickerReferenceEl = this.shadowRoot.querySelector('paper-input');
+        this.keys = {};
+      },
+
+      valueChanged: function() {
+        this.super();
+        this.elementName =
+          this.value.type == gapi.drive.realtime.CollaborativeTypes
+          .COLLABORATIVE_MAP ? 'Collaborative Map' : this.value.type;
+      },
+
+      isClosedChanged: function() {
+        var that = this;
+        setTimeout(function(){
+          that.setupPicker();
+        }, 0);
+      },
+
+      newKeyChanged: function() {
+        this.setupPicker();
+      },
+
+      create: function() {
+        this.super();
+        var keys = this.value.keys();
+        for (var i = 0; i < keys.length; i++) {
+          this.createAndAppendItem(keys[i]);
+        }
+      },
+
+      update: function(evt) {
+        // All changes are value changed changes
+        if(evt.oldValue == null){
+          // Adding
+          this.createAndAppendItem(evt.property);
+        } else if (typeof this.value.get(evt.property) == 'string') {
+          // Update element if json value
+          var node = this.keys[evt.property];
+          node.value = evt.newValue;
+        } else if (evt.newValue == null){
+          // Removing
+          var node = this.keys[evt.property];
+          if(node){
+            this.$.mapItems.removeChild(node);
+            delete this.keys[evt.property];
+          }
+        }
+      },
+
+      add: function(el) {
+        this.value.set(this.$.newKey.value, el.value);
+        this.isClosed = true;
+      },
+
+      set: function(data) {
+        if (data.type === 'key') {
+          this.setKey(data);
+        } else {
+          this.setValue(data);
+        }
+      },
+
+      createAndAppendItem: function(key) {
+        var item = document.createElement(
+          this.globals.COLLABORATIVE_MAP_ITEM);
+        item.key = key;
+        item.value = this.value.get(key);
+        item.parent = this;
+        item.fileId = this.fileId;
+        this.$.mapItems.appendChild(item);
+        this.keys[key] = item;
+      },
+
+      remove: function(key) {
+        this.value.set(key, null);
+      },
+
+      setKey: function(data) {
+        var value = this.value.get(data.originalValue);
+        this.value.set(data.originalValue, null);
+        this.value.set(data.value, value);
+      },
+
+      setupPicker: function() {
+        this.super();
+      },
+
+      setValue: function(data) {
+        this.value.set(data.key, data.value)
+      },
+
+      shouldOpenPicker: function() {
+        return !this.isClosed && this.newKey;
+      }
+    });
+  </script>
+</polymer-element>

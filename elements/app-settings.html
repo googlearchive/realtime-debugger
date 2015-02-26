@@ -1,0 +1,88 @@
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="../components/core-icon/core-icon.html">
+<link rel="import" href="base-debugger-element.html">
+
+<polymer-element
+    name="app-settings"
+    attributes="fileId"
+    extends="base-debugger-element">
+  <template>
+      <div id="container">
+        <div id="left">
+          Realtime Debug Console
+        </div>
+        <div id="right">
+          <div class="control" hidden?="{{ !isInFrame }}">
+            <label for="debug" >Debug</label>
+            <input id="debug"
+                name="debug"
+                type="checkbox"
+                checked="{{ globals.documentHolder.isDebugable }}">
+          </div>
+          <div class="control">
+            <label for="events">View Events</label>
+            <input id="events"
+                name="events"
+                on-change="{{ onViewEventsChange }}"
+                type="checkbox"
+                checked="{{ globals.documentHolder.showEvents }}">
+          </div>
+          <div class="control">
+            <label for="edit">Edit</label>
+            <input id="edit"
+                name="edit"
+                type="checkbox"
+                checked="{{ globals.documentHolder.isEditable }}">
+          </div>
+          <core-icon
+            id="close"
+            icon="close"
+            on-click="{{ close }}">
+          </core-icon>
+        </div>
+      </div>
+  </template>
+  <script>
+    Polymer({
+      ready: function() {
+        this.super();
+        this.isInFrame = true//(window != top);
+      },
+
+      configureParentWindow: function() {
+        if (this.isInFrame) {
+          this.globals.messenger.post({
+            type: 'init',
+            handleLeftOffset: 155,
+            handleRightOffset: 177,
+            handleHeight: 27
+          });
+        }
+      },
+
+      popOut: function() {
+        var strWindowFeatures = 'menubar=no,location=no,resizable=yes,' +
+          'scrollbars=yes,status=yes';
+        window.open(self.location.href, 'realtime_debugger_window',
+          strWindowFeatures);
+        this.close();
+      },
+
+      onViewEventsChange: function () {
+        this.classList.toggle('showing-events');
+      },
+
+      close: function() {
+        if (this.isInFrame) {
+          // We are in an iframe, remove the iframe
+          this.globals.messenger.post({
+            type: 'close'
+          });
+        } else {
+          // We are not in an iframe, close the tab
+          window.close();
+        }
+      }
+    });
+  </script>
+</polymer-element>

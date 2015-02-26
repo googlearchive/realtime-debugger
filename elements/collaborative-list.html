@@ -1,0 +1,188 @@
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="base-collaborative-element.html">
+<link rel="import" href="collaborative-list-item.html">
+<link rel="import" href="drag-icon.html">
+
+<polymer-element
+    name="collaborative-list"
+    attributes="value parent"
+    extends="base-collaborative-element">
+  <template>
+    <shadow></shadow>
+    <div id="content" hidden?="{{ contentHidden }}">
+      <div id="listItems"></div>
+      <div id="add" hidden?="{{ !globals.documentHolder.isEditable }}">
+        <core-icon
+          class="add-item {{ isClosed ? '' : 'close' }}"
+          on-click="{{ toggleAdd }}"
+          icon="add">
+        </core-icon>
+      </div>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      ready: function() {
+        this.super();
+        this.elementName = 'Collaborative List';
+        this.pickerReferenceEl = this.shadowRoot.querySelector('.add-item');
+        this.setBindings();
+      },
+
+      setBindings: function() {
+        this.onDragEnd = this.onDragEnd.bind(this);
+        this.onDragEnter = this.onDragEnter.bind(this);
+        this.onDragStart = this.onDragStart.bind(this);
+        this.onDragLeave = this.onDragLeave.bind(this);
+        this.onMetaDragEnter = this.onMetaDragEnter.bind(this);
+        this.onMetaDragLeave = this.onMetaDragLeave.bind(this);
+      },
+
+      isClosedChanged: function() {
+        var that = this;
+        setTimeout(function(){
+          that.setupPicker();
+        }, 0);
+      },
+
+      create: function() {
+        this.super();
+        if (this.$.listItems.childNodes.length) {
+          this.$.listItems.innerHTML = '';
+        }
+        var arr = this.value.asArray();
+        for (var i = 0; i < arr.length; i++) {
+          this.createAndAppendItem(i, arr[i]);
+        }
+      },
+
+      update: function(evt) {
+        switch (evt.type) {
+
+          // Create new values and insert it at the proper index
+          case gapi.drive.realtime.EventType.VALUES_ADDED:
+            for (var i = 0; i < evt.values.length; i++) {
+              this.createAndAppendItem(i + evt.index, evt.values[i]);
+            }
+            break;
+
+          // Remove the children from their proper index in reverse order
+          case gapi.drive.realtime.EventType.VALUES_REMOVED:
+            for (var i = evt.values.length - 1; i >= 0; i--) {
+              this.$.listItems.removeChild(
+                this.$.listItems.children[i + evt.index]);
+            }
+            break;
+
+          // Rewrite the value property for the child at each index
+          case gapi.drive.realtime.EventType.VALUES_SET:
+            for (var i = 0; i < evt.newValues.length; i++) {
+              this.$.listItems.children[i + evt.index]
+                .querySelector(this.globals.COLLABORATIVE_LIST_ITEM)
+                .value = evt.newValues[i];
+            }
+            break;
+        }
+      },
+
+      add: function(el) {
+        this.value.push(el.value);
+        this.isClosed = '';
+        this.valueChanged();
+      },
+
+      set: function(data) {
+        this.value.set(data.index, data.value);
+      },
+
+      setupPicker: function() {
+        this.super();
+      },
+
+      remove: function(index) {
+        this.value.remove(index);
+      },
+
+      createAndAppendItem: function(index, value) {
+        var itemContainer = document.createElement('div');
+        var handle = document.createElement('drag-icon');
+        itemContainer.appendChild(handle);
+
+        handle.addEventListener('dragstart', this.onDragStart);
+        handle.addEventListener('dragend', this.onDragEnd);
+
+        itemContainer.addEventListener('dragenter', this.onDragEnter);
+        itemContainer.addEventListener('dragover', this.onDragEnter);
+        itemContainer.addEventListener('dragleave', this.onDragLeave);
+
+        this.$.meta.addEventListener('dragenter', this.onMetaDragEnter);
+        this.$.meta.addEventListener('dragover', this.onMetaDragEnter);
+        this.$.meta.addEventListener('dragleave', this.onMetaDragLeave);
+
+        var item = document.createElement(
+          this.globals.COLLABORATIVE_LIST_ITEM);
+        item.index = index;
+        item.value = value;
+        item.parent = this;
+        item.fileId = this.fileId;
+
+        itemContainer.appendChild(item);
+
+        if(this.$.listItems.children[index]){
+          this.$.listItems.insertBefore(itemContainer, this.$.listItems.children[index]);
+        } else {
+          this.$.listItems.appendChild(itemContainer);
+        }
+      },
+
+
+      /**
+       * Functions for dragging/reordering list items.
+       */
+      onDragStart: function(evt) {
+        event.dataTransfer.effectAllowed = 'copy';
+          evt.dataTransfer.setDragImage(evt.target.nextSibling.shadowRoot.querySelector('#value'), 0, 0);
+      },
+
+      onDragEnd: function(evt) {
+        this.move(evt);
+      },
+
+      onDragEnter: function(evt) {
+        evt.target.parentElement.classList.add('hover');
+        this.endIndexEl = evt.target;
+      },
+
+      onDragLeave: function(evt) {
+        evt.target.parentElement.classList.remove('hover');
+        this.endIndexEl = evt.target;
+      },
+
+      onMetaDragEnter: function(evt) {
+        evt.target.shadowRoot.querySelector('.metadata').classList.add('hover');
+        this.endIndexEl = 0;
+      },
+
+      onMetaDragLeave: function(evt) {
+        evt.target.shadowRoot.querySelector('.metadata').classList.remove('hover');
+        this.endIndexEl = 0;
+      },
+
+      move: function(evt) {
+        var startIndex = evt.target.index;
+        var endIndex;
+
+        var startIndex = Array.prototype
+          .indexOf.call(this.$.listItems.children, evt.target.parentElement);
+
+        if (this.endIndexEl != 0) {
+          endIndex = Array.prototype
+            .indexOf.call(this.$.listItems.children, this.endIndexEl.parentElement) + 1;
+        } else {
+          endIndex = 0;
+        }
+        this.value.move(startIndex, endIndex);
+      }
+    });
+  </script>
+</polymer-element>

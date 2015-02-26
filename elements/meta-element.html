@@ -1,0 +1,107 @@
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="base-debugger-element.html">
+<link rel="import" href="collaborative-map.html">
+<link rel="import" href="collaborator-display.html">
+
+<polymer-element
+    name="meta-element"
+    attributes="metadata"
+    extends="base-debugger-element">
+  <template>
+    <div class="metadata">
+      <core-icon
+        id="expandIcon"
+        class="collapse"
+        icon="expand-more"
+        on-click="{{ toggleExpand }}">
+      </core-icon>
+      <content select="core-icon"></content>
+    </div>
+  </template>
+  <script>
+    Polymer({
+
+      /*
+        This element works by passing in a string that denotes each span
+        to be created. There are three types that this elements accepts.
+
+        1) p - For primary
+        2) s - For secondary
+        3) t - For tertiary
+
+        Your string should follow this schema:
+
+        {type}:{string}
+
+        The following string:
+
+        p:Hellos:World
+
+        Would produce this output:
+
+        <span class="color-primary">Hello</span>
+        <span class="color-secondary">World</span>
+
+        Note that no white space is introduced in the HTML, thus any white
+        space will have to be included in the string.
+      **/
+
+      re: /(.:.+?(?=(.:|$)))/g,
+
+      elements: [],
+
+      ready: function() {
+        this.super();
+        this.metadataEl = this.shadowRoot.querySelector('.metadata');
+      },
+
+      metadataChanged: function() {
+        this.elements = [];
+        var match = this.re.exec(this.metadata);
+        this.elements.push(match);
+        while(match){
+          match = this.re.exec(this.metadata);
+          if(match){
+            this.elements.push(match);
+          }
+        }
+        this.clear();
+        this.build();
+      },
+
+      clear: function() {
+        var spans = this.shadowRoot.querySelectorAll('span');
+        for (var i = spans.length - 1; i >= 0; i--) {
+          this.metadataEl.removeChild(spans[i]);
+        };
+      },
+
+      build: function() {
+        for (var i = 0; i < this.elements.length; i++) {
+          var span = document.createElement('span');
+          span.classList.add(function(item) {
+            switch (/(.):/g.exec(item[0])[0].replace(':','')) {
+              case 'p': return 'color-primary';
+              case 's': return 'color-secondary';
+              case 't': return 'color-tertiary';
+            }
+          }(this.elements[i]));
+          span.textContent = this.elements[i][0].split(':')[1];
+          this.metadataEl.appendChild(span);
+        };
+      },
+
+      toggleExpand: function() {
+        if (!this.isOpened) {
+          this.isOpened = true;
+        }
+        this.$.expandIcon.classList.toggle('collapse');
+        this.parent.contentHidden = !this.parent.contentHidden;
+      },
+
+      toggleClass: function(className) {
+        this.classList.toggle(className);
+      }
+    });
+  </script>
+</polymer-element>

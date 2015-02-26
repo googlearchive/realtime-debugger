@@ -1,0 +1,173 @@
+<link rel="import" href="../components/core-icons/image-icons.html">
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="meta-element.html">
+<link rel="import" href="base-debugger-element.html">
+
+<polymer-element
+    name="base-collaborative-element"
+    attributes="value parent elementName"
+    extends="base-debugger-element">
+  <template>
+    <meta-element id="meta">
+      <core-icon
+        id="debugIcon"
+        hidden?="{{ !globals.documentHolder.isDebugable }}"
+        icon="label-outline"
+        on-click="{{ toggleDebug }}">
+      </core-icon>
+    </meta-element>
+  </template>
+  <script>
+    Polymer({
+      /**
+       * Initial setup for the controls of this element.
+       */
+      ready: function() {
+        this.super();
+        this.valueChanged = this.valueChanged.bind(this);
+        this.contentHidden = true;
+        this.isClosed = true;
+        this.debug = false;
+        this.$.meta.parent = this;
+        this.update = this.update.bind(this);
+      },
+
+      /**
+       * Event handler for a value changed event.
+       */
+      valueChanged: function() {
+
+      },
+
+      elementNameChanged: function() {
+        this.$.meta.metadata = 'p:' + this.elementName +
+          ' t:id=\"s:' + this.value.id + 't:\"';
+      },
+
+      contentHiddenChanged: function() {
+        if(!this.contentHidden && !this.hasBeenCreated){
+          this.create();
+        }
+      },
+
+      /**
+       * The first time we have received this value, crate the needed html
+       * on the DOM. This function should first clear any existing HTML, and
+       * then create all of the HTML as the value currently is.
+       */
+      create: function() {
+        this.hasBeenCreated = true;
+        this.setListeners();
+      },
+
+      /**
+       * This function should handle the various kinds of events for each
+       * collaborative element. The UI should be updated, but not emptied.
+       */
+      update: function(evt) {
+
+      },
+
+      /**
+       * Sets all of the appropriate listeners depending on the type of
+       * the collaborative element.
+       */
+      setListeners: function() {
+        var listenerTypes = [];
+        var types = gapi.drive.realtime.CollaborativeTypes;
+        var eventTypes = gapi.drive.realtime.EventType;
+        switch (this.value.type) {
+          case types.COLLABORATIVE_LIST:
+            listenerTypes = [eventTypes.VALUES_ADDED, eventTypes.VALUES_REMOVED,
+                             eventTypes.VALUES_SET];
+            break;
+          case types.COLLABORATIVE_STRING:
+            listenerTypes = [eventTypes.TEXT_INSERTED, eventTypes.TEXT_DELETED];
+            break;
+          case types.INDEX_REFERENCE:
+            listenerTypes = [eventTypes.REFERENCE_SHIFTED];
+            break;
+          default: // Collaborative Map or Custom Object
+            listenerTypes = [eventTypes.VALUE_CHANGED];
+            break;
+        }
+
+        for (var i = listenerTypes.length - 1; i >= 0; i--) {
+          this.value.addEventListener(listenerTypes[i], this.update);
+        }
+      },
+
+      /**
+       * Function that handles adding to a collaborative object. Should be
+       * overridden for each collaborative object that supports such an action.
+       */
+      add: function() {},
+
+      /**
+       * Function that handles setting to a collaborative object. Should be
+       * overridden for each collaborative object that supports such an action.
+       */
+      set: function() {},
+
+      /**
+       * Function that handles removing from a collaborative object. Should be
+       * overridden for each collaborative object that supports such an action.
+       */
+      remove: function() {},
+
+      /**
+       * Sends a debug message to the parent window to create a breakpoint on
+       * a change event for this collaborative object.
+       */
+      toggleDebug: function() {
+        var that = this;
+        var fileId;
+        this.debug = !this.debug;
+        this.globals.messenger.post({
+          type: 'debug',
+          add: this.debug,
+          objectId: this.value.id,
+          fileId: function() {
+            var current = that;
+            while (current.parent) {
+              current = current.parent;
+            }
+            return current.fileId;
+          }(),
+        });
+        this.$.meta.toggleClass('debug-active');
+      },
+
+      /**
+       * Toggles the isClosed boolean which determines if the addition icon and
+       * value picker are displayed.
+       */
+      toggleAdd: function() {
+        this.isClosed = !this.isClosed;
+      },
+
+      shouldOpenPicker: function() {
+        return !this.isClosed;
+      },
+
+      setupPicker: function() {
+        if(this.shouldOpenPicker()) {
+          this.picker = this.globals.getPicker();
+          var rect = this.pickerReferenceEl.getClientRects()[0];
+          this.picker.parent = this;
+          this.picker.top = rect.top;
+          this.picker.left = rect.left + this.pickerReferenceEl.clientWidth + 10;
+          this.picker.visible = true;
+        } else {
+          this.removePicker();
+        }
+      },
+
+      removePicker: function() {
+        if (this.picker) {
+          this.picker.visible = false;
+        }
+      }
+    });
+  </script>
+</polymer-element>

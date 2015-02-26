@@ -1,0 +1,62 @@
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="base-debugger-element.html">
+
+<polymer-element
+    name="base-collaborative-item"
+    attributes="index key value parent"
+    extends="base-debugger-element">
+  <template>
+    <core-icon
+      class="delete-icon"
+      hidden?="{{ !globals.documentHolder.isEditable }}"
+      icon="delete"
+      on-click="{{ remove }}">
+    </core-icon>
+  </template>
+  <script>
+    Polymer({
+      ready: function() {
+        this.super();
+      },
+
+      valueChanged: function() {
+        this.$.value.innerHTML = '';
+        var type;
+        switch (this.value.type) {
+          case gapi.drive.realtime.CollaborativeTypes.COLLABORATIVE_LIST:
+            type = this.globals.COLLABORATIVE_LIST; break;
+          case gapi.drive.realtime.CollaborativeTypes.COLLABORATIVE_MAP:
+            type = this.globals.COLLABORATIVE_MAP; break;
+          case gapi.drive.realtime.CollaborativeTypes.COLLABORATIVE_STRING:
+            type = this.globals.COLLABORATIVE_STRING; break;
+          case gapi.drive.realtime.CollaborativeTypes.INDEX_REFERENCE:
+            type = this.globals.INDEX_REFERENCE; break;
+          default:
+            if(this.value.type){
+              type = this.globals.COLLABORATIVE_MAP; // Custom Objects
+            } else {
+              type = this.globals.JSON_VALUE;
+            }
+        }
+
+        var valueEl = document.createElement(type);
+        valueEl.key = this.key;
+        valueEl.index = this.index;
+        valueEl.parent = this.parent;
+        valueEl.fileId = this.fileId;
+        valueEl.value = this.value;
+        this.$.value.appendChild(valueEl);
+      },
+
+      getIndex: function() {
+        return Array.prototype.indexOf.call(
+          this.parent.$.listItems.children, this.parentElement)
+      },
+
+      remove: function () {
+        var value = typeof this.index === 'number' ? this.getIndex() : this.key;
+        this.parent.remove(value);
+      }
+    });
+  </script>
+</polymer-element>

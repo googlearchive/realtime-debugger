@@ -1,0 +1,16 @@
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="app-globals.html">
+
+<polymer-element
+    name="base-debugger-element">
+  <template>
+    <app-globals id="globals"></app-globals>
+  </template>
+  <script>
+    Polymer({
+      ready: function() {
+        this.globals = this.$.globals;
+      }
+    });
+  </script>
+</polymer-element>

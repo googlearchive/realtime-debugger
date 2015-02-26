@@ -1,0 +1,64 @@
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="base-debugger-element.html">
+<link rel="import" href="meta-element.html">
+
+<polymer-element
+    name="collaborator-display"
+    attributes="collaborators"
+    extends="base-debugger-element">
+  <template bind="{{ collaborators }}">
+    <meta-element id="meta"></meta-element>
+    <div id="content" hidden?="{{ contentHidden }}">
+      <template repeat="{{ collaborator in collaborators }}">
+        <table>
+          <tr>
+            <td class="color-primary">color</td>
+            <td class="color-string">{{ collaborator.color }}</td>
+          </tr>
+          <tr>
+            <td class="color-primary">displayName</td>
+            <td class="color-string">{{ collaborator.displayName }}</td>
+          </tr>
+          <tr>
+            <td class="color-primary">isAnonymous</td>
+            <td class="color-string">{{ collaborator.isAnonymous }}</td>
+          </tr>
+          <tr>
+            <td class="color-primary">isMe</td>
+            <td class="color-string">{{ collaborator.isMe }}</td>
+          </tr>
+          <tr>
+            <td class="color-primary">permissionId</td>
+            <td class="color-string">{{ collaborator.permissionId }}</td>
+          </tr>
+          <tr>
+            <td class="color-primary">photoUrl</td>
+            <td class="color-string">{{ collaborator.photoUrl }}</td>
+          </tr>
+          <tr>
+            <td class="color-primary">sessionId</td>
+            <td class="color-string">{{ collaborator.sessionId }}</td>
+          </tr>
+          <tr>
+            <td class="color-primary">userId</td>
+            <td class="color-string">{{ collaborator.userId }}</td>
+          </tr>
+        </table>
+      </template>
+    </div>
+  </template>
+  <content></content>
+  <script>
+    Polymer({
+      ready: function() {
+        this.$.meta.parent = this;
+        this.contentHidden = true;
+      },
+
+      collaboratorsChanged: function() {
+        this.$.meta.metadata = 'p:Active Collaborators s:[' +
+          this.collaborators.length + ']';
+      }
+    });
+  </script>
+</polymer-element>

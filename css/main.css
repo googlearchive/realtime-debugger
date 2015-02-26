@@ -1,0 +1,418 @@
+/*
+ * General Styles
+ */
+html,body {
+  margin: 0;
+  cursor: default;
+  font-family: 'Lucida Console', 'Lucida Sans Typewriter', monaco, 'Bitstream Vera Sans Mono', monospace;
+}
+
+body /deep/ .color-primary {
+  color: #882083;
+}
+
+body /deep/ .color-secondary {
+  color: #213dcc;
+}
+
+body /deep/ .color-tertiary {
+  color: #c25c1f;
+}
+
+body /deep/ .color-string {
+  color: #c41a16;
+}
+
+em /deep/ {
+  font-style: italic;
+}
+
+body /deep/ collaborative-list,
+body /deep/ collaborative-map,
+body /deep/ collaborative-string,
+body /deep/ json-value,
+body /deep/ index-reference,
+body /deep/ collaborative-list-item,
+body /deep/ collaborative-map-item,
+body /deep/ editable-cell {
+  display: block;
+  position: relative;
+  width: 100%;
+  padding: 0px;
+}
+
+body /deep/ collaborative-list > collaborative-map,
+body /deep/ collaborative-list > collaborative-list,
+body /deep/ collaborative-list > collaborative-string,
+body /deep/ collaborative-map > collaborative-map,
+body /deep/ collaborative-map > collaborative-list,
+body /deep/ collaborative-map > collaborative-string, {
+  padding: 20px;
+}
+
+body /deep/ #content {
+  padding: 0px 0px 10px 30px;
+}
+
+body /deep/ .value {
+  display: inline-block;
+}
+
+body /deep/ .id {
+  font-style: italic;
+}
+
+body /deep/ .type {
+  margin-left: -10px;
+}
+
+body /deep/ #expandIcon {
+  margin-right: -9px;
+}
+
+body /deep/ #expandIcon.collapse {
+  transition: all .2s;
+  transform: rotate(-90deg)
+}
+
+body /deep/ meta-element.debug-active::shadow .metadata {
+  background-color: #ABBFFE;
+  border: 1px solid #4073F4;
+  border-style: inset;
+}
+
+body /deep/ .metadata {
+  border: 1px solid transparent;
+}
+
+body /deep/ meta-element.debug-active #debugIcon {
+  color: white;
+}
+
+body /deep/ #debugIcon {
+  margin-right: -6px;
+}
+
+body /deep/ .add-item {
+  transition: all .3s;
+  float: left;
+  vertical-align: top;
+  color: #6E6E6E;
+}
+
+body /deep/ .add-item.close {
+  transition: all .3s;
+  transform: rotate(45deg);
+}
+
+body /deep/ value-picker, paper-input {
+  display: inline-block;
+}
+
+body /deep/ .metadata span {
+  font-size: 12px;
+}
+
+body /deep/ .delete-icon {
+  float: left;
+  width: 19px;
+  height: 19px;
+  z-index: 100;
+}
+
+body /deep/ collaborative-document /deep/ core-icon {
+  width: 18px !important;
+  height: 18px !important;
+  color: #6E6E6E;
+  cursor: default;
+  transition: all .2s;
+}
+
+
+/*
+ * Index Reference Styles
+ */
+body /deep/ td {
+  font-size: 12px;
+}
+
+body /deep/ paper-input,
+body /deep/ td,
+body /deep/ paper-item {
+  font-size: 12px;
+}
+
+body /deep/ index-reference::shadow table td:first-child {
+  padding-right: 15px;
+}
+
+
+/**
+ * Document Styles
+ */
+body /deep/ debug-app::shadow #docs {
+  margin-top: 30px;
+}
+
+body /deep/ debug-app::shadow app-settings.showing-events ~ #docs {
+  width: calc(100% - 300px);
+}
+
+body /deep/ debug-app::shadow app-settings.showing-events ~ event-viewer {
+  display: block;
+}
+
+body /deep/ debug-app::shadow app-settings ~ event-viewer {
+  display: none;
+}
+
+
+/*
+ * Settings Pane (Header) Styles
+ */
+body /deep/ app-settings {
+  font-family: 'RobotoDraft', sans-serif;
+  width: 100%;
+}
+
+body /deep/ app-settings::shadow #container {
+  width: 100%;
+  height: 25px;
+  border-top: 1px solid #A3A3A3;
+  border-bottom: 1px solid #A3A3A3;
+  background-color: #DFDFDF;
+  font-size: 13px;
+  line-height: 25px;
+  position: fixed;
+  z-index: 999999;
+  top: 0;
+  left: 0;
+}
+
+body /deep/ app-settings::shadow #left {
+  float: left;
+  margin-left: 10px;
+}
+
+body /deep/ app-settings::shadow #right {
+  float: right;
+}
+
+body /deep/ app-settings::shadow #close {
+  transition: none;
+  border-radius: 25px;
+}
+
+body /deep/ app-settings::shadow #close:hover {
+  background-color: #e89892;
+  color: white;
+  transition: none;
+}
+
+body /deep/ app-settings::shadow core-icon {
+  margin: 0px 2px;
+}
+
+body /deep/ app-settings::shadow #close {
+  height: 16px !important;
+  width: 16px !important;
+  color: #666;
+  margin-top: -3px;
+}
+
+body /deep/ app-settings::shadow #openInNew {
+  height: 18px !important;
+  width: 18px !important;
+  color: #666;
+  margin-top: -3px;
+}
+
+body /deep/ app-settings::shadow #openInNew:hover {
+  color: #333;
+}
+
+body /deep/ app-settings::shadow input[type=checkbox] {
+  vertical-align: middle;
+}
+
+body /deep/ app-settings::shadow .control {
+  display: inline-block;
+  margin-right: 5px;
+}
+
+body /deep/ app-settings::shadow label {
+  padding: 0px 5px;
+}
+
+
+/*
+ * Collaborator Display Styles
+ */
+body /deep/ collaborator-display::shadow table {
+  margin-bottom: 20px;
+}
+
+body /deep/ collaborator-display::shadow  table:last-child{
+  margin: 0;
+}
+
+body /deep/ collaborator-display::shadow table td:nth-child(2){
+  padding-left: 15px;
+}
+
+
+/*
+ * Editable Cells Style
+ */
+body /deep/ editable-cell {
+  padding-right: 5px;
+}
+
+body /deep/ editable-cell::shadow input {
+  font-family: 'Lucida Console', 'Lucida Sans Typewriter', monaco, 'Bitstream Vera Sans Mono', monospace;
+  font-size: 12px;
+  height: 15px;
+  border: 1px solid transparent;
+  width: calc(100% - 30px);
+  padding-left: 5px;
+  margin: 0;
+}
+
+body /deep/ editable-cell::shadow input:hover {
+  border: 1px dashed black;
+}
+
+body /deep/ editable-cell::shadow input.editing-true {
+  padding-left: 2px;
+  font-style: italic;
+  border: 1px solid black;
+}
+
+body /deep/ editable-cell::shadow input.global-editable-false:hover {
+  border: 1px solid transparent;
+  cursor: default;
+}
+
+body /deep/ editable-cell::shadow input[disabled] {
+  background-color: transparent;
+  color: black;
+}
+
+
+/*
+ * List Styles
+ */
+body /deep/ collaborative-list::shadow .splitter {
+  width: 100px;
+  height: 0px;
+  border: 1px dashed black;
+}
+
+body /deep/ collaborative-list::shadow .reorder-icon{
+  float: left;
+  margin-right: 5px;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+  cursor: grab;
+}
+
+body /deep/ drag-icon {
+  position: absolute;
+  margin-top: -1px;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+  cursor: grab;
+  z-index: 100;
+}
+
+body /deep/ collaborative-list-item::shadow .delete-icon {
+  margin-left: 20px;
+}
+
+body /deep/ collaborative-list-item::shadow #value {
+  transition: .1s all;
+}
+
+body /deep/ collaborative-list::shadow #listItems div.hover collaborative-list-item::shadow #value {
+  margin-bottom: 15px;
+  transition: .1s all;
+}
+
+body /deep/ .metadata {
+  transition: .1s all;
+}
+
+body /deep/ .metadata.hover {
+  margin-bottom: 15px;
+  transition: .1s all;
+}
+
+
+/*
+ * Value Picker Styles
+ */
+body /deep/ value-picker::shadow .container {
+  position: absolute;
+  z-index: 100;
+  background-color: white;
+}
+
+body /deep/ value-picker::shadow paper-shadow {
+  width: 200px;
+}
+
+body /deep/ value-picker::shadow paper-item:hover {
+  background-color: #4682b4;
+  color: white;
+}
+
+
+/*
+ * Collaborative Map Styles
+ */
+body /deep/ collaborative-map::shadow.key {
+  width: 150px;
+}
+
+body /deep/ collaborative-map::shadow.key, .value {
+  display: inline-block;
+  vertical-align: top;
+}
+
+body /deep/ collaborative-map::shadow.item-container {
+  padding: 3px;
+}
+
+/*
+ * Collaborative Map Item Styles
+ */
+body /deep/ collaborative-map-item::shadow #item,
+body /deep/ collaborative-map-item::shadow #value,
+body /deep/ collaborative-list-item::shadow #item,
+body /deep/ collaborative-list-item::shadow #value {
+  overflow: hidden;
+}
+
+body /deep/ collaborative-map-item::shadow .key-actions {
+  float: left;
+}
+
+
+
+
+
+/* Event Viewer Styles */
+
+body /deep/ #cards {
+  position: absolute;
+  right: 0;
+  top: 27px;
+  font-size: 11px;
+  border-left: 1px solid #ccc;
+  width: 300px;
+}
+
+body /deep/ event-card::shadow .content {
+  padding: 5px;
+  border-bottom: 1px solid #ccc;
+};

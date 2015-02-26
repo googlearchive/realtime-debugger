@@ -1,0 +1,66 @@
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="../components/paper-shadow/paper-shadow.html">
+<link rel="import" href="../components/paper-item/paper-item.html">
+<link rel="import" href="base-debugger-element.html">
+
+<polymer-element
+    name="value-picker"
+    attributes="parent, visible, top, left"
+    extends="base-debugger-element">
+  <template>
+    <div class="container"
+      style="top:{{ top }}px;left:{{ left }}px"
+      hidden?="{{ !visible }}">
+      <paper-shadow>
+          <paper-item on-click="{{ onMapClick }}">Collaborative Map</paper-item>
+          <paper-item on-click="{{ onListClick }}">Collaborative List</paper-item>
+          <paper-item on-click="{{ onStringClick }}">Collaborative String</paper-item>
+          <paper-item on-click="{{ onJsonValueClick }}">JSON Value</paper-item>
+      </paper-shadow>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      onMapClick: function() {
+        this.create(this.globals.COLLABORATIVE_MAP,
+          this.globals.getModel(this.getFileId()).createMap());
+      },
+
+      onListClick: function() {
+        this.create(this.globals.COLLABORATIVE_LIST,
+          this.globals.getModel(this.getFileId()).createList());
+      },
+
+      onStringClick: function() {
+        this.create(this.globals.COLLABORATIVE_STRING,
+          this.globals.getModel(this.getFileId()).createString());
+      },
+
+      onJsonValueClick: function() {
+        this.create(this.globals.JSON_VALUE,'');
+      },
+
+      /**
+       * Walks up the document tree to get the fileId from the root.
+       */
+      getFileId: function() {
+        var child = this;;
+        while (child.parent) {
+          child = child.parent;
+        }
+        return child.fileId;
+      },
+
+      /**
+       * Creates html and passes it to the parent's add function.
+       */
+      create: function (type, value) {
+        var el = document.createElement(type);
+        el.value = value;
+        el.parent = this.parent;
+        this.parent.add(el);
+        this.parent.isClosed = true;
+      }
+    });
+  </script>
+</polymer-element>

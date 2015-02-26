@@ -1,0 +1,58 @@
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="base-collaborative-element.html">
+<link rel="import" href="editable-cell.html">
+
+<polymer-element
+    name="index-reference"
+    attributes="value parent"
+    extends="base-collaborative-element">
+  <template>
+    <shadow></shadow>
+    <div id="content" hidden?="{{ contentHidden }}">
+      <table>
+        <tr>
+          <td>index</td>
+          <td><editable-cell number id="editableCell"></editable-cell></td>
+        </tr>
+        <tr>
+          <td>canBeDeleted</td>
+          <td>{{ value.canBeDeleted }} - <em>Read Only</em></td>
+        </tr>
+        <tr>
+          <td>referencedObject id</td>
+          <td>{{ value.referencedObject.id }} - <em>Read Only</em></td>
+        </tr>
+      </table>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      ready: function() {
+        this.super();
+        this.elementName = 'Index Reference';
+      },
+
+      create: function() {
+        this.super();
+        this.$.editableCell.data = {
+          value: this.value.index,
+          parent: this
+        }
+        this.$.editableCell.inputType = 'number';
+        this.index = this.value.index;
+      },
+
+      update: function(evt) {
+        this.super();
+        if( evt.local ){
+          return;
+        }
+        this.$.editableCell.data.value = evt.newIndex;
+      },
+
+      set: function(data) {
+        this.value.index = parseInt(data.value);
+      }
+    });
+  </script>
+</polymer-element>

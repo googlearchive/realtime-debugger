@@ -1,0 +1,54 @@
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="../components/paper-input/paper-input.html">
+<link rel="import" href="base-debugger-element.html">
+
+<polymer-element
+    name="editable-cell"
+    attributes="data"
+    extends="base-debugger-element">
+  <template>
+    <input class="editable-input editing-{{ isEditable }} global-editable-{{ globals.documentHolder.isEditable }}"
+          type="{{ inputType }}"
+          placeholder="empty"
+          disabled?="{{ !globals.documentHolder.isEditable }}"
+          on-focus="{{ onFocus }}"
+          on-blur="{{ onBlur }}"
+          on-keyup="{{ onKeyup }}"
+          value="{{ data.value }}"></input>
+  </template>
+  <script>
+    Polymer({
+      ready: function() {
+        this.super();
+        this.input = this.shadowRoot.querySelector('.editable-input');
+        this.inputType = 'text';
+      },
+
+      onFocus: function() {
+        this.isEditable = true;
+        this.data.originalValue = this.data.value;
+        if (this.inputType == 'text') {
+          this.input.setSelectionRange(0, this.input.value.length);
+        }
+      },
+
+      onBlur: function() {
+        this.isEditable = false;
+        this.persist();
+      },
+
+      onKeyup: function(evt) {
+        if (evt.keyCode === 13) {
+          this.input.blur();
+        }
+      },
+
+      /**
+       * Let the parent handle the logic of actually setting the new value.
+       */
+      persist: function() {
+        this.data.parent.set(this.data);
+      }
+    });
+  </script>
+</polymer-element>

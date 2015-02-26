@@ -1,0 +1,32 @@
+{
+  "name": "realtime-debugger",
+  "version": "0.0.0",
+  "homepage": "https://github.com/googledrive/realtime-debugger",
+  "authors": [
+    "Seth Howard <smiles.seth@gmail.com>"
+  ],
+  "description": "The application behind gapi.drive.realtime.debug()",
+  "main": "index.html",
+  "keywords": [
+    "google",
+    "drive",
+    "realtime",
+    "api",
+    "debug"
+  ],
+  "license": "Apache 2",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "paper-input": "Polymer/paper-input#~0.5.5",
+    "paper-item": "Polymer/paper-item#~0.5.5",
+    "paper-shadow": "Polymer/paper-shadow#~0.5.5",
+    "core-ajax": "Polymer/core-ajax#~0.5.5",
+    "font-roboto": "Polymer/font-roboto#~0.5.5"
+  }
+}

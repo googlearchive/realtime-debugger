@@ -1,0 +1,30 @@
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="base-debugger-element.html">
+<link rel="import" href="event-card.html">
+
+<polymer-element
+    name="event-viewer"
+    extends="base-debugger-element">
+  <template>
+    <div id="cards">
+      <template repeat="{{event in eventsList}}">
+          <event-card event="{{event}}"></event-card>
+      </template>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      ready: function() {
+        this.super();
+        this.eventsList = [];
+      },
+
+      addEvent: function(event) {
+        this.eventsList.unshift(event);
+        if(this.eventsList.length > 200){
+          this.eventsList.pop();
+        }
+      }
+    });
+  </script>
+</polymer-element>

@@ -1,0 +1,18 @@
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="base-debugger-element.html">
+
+<polymer-element
+    name="drag-icon"
+    extends="base-debugger-element">
+  <template>
+    <core-icon
+      hidden?="{{ !globals.documentHolder.isEditable }}"
+      icon="reorder"
+      draggable="true"
+      class="reorder-icon">
+    </core-icon>
+  </template>
+  <script>
+    Polymer({});
+  </script>
+</polymer-element>

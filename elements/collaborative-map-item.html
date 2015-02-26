@@ -1,0 +1,39 @@
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="base-collaborative-item.html">
+<link rel="import" href="collaborative-list.html">
+<link rel="import" href="collaborative-string.html">
+<link rel="import" href="editable-cell.html">
+<link rel="import" href="index-reference.html">
+<link rel="import" href="json-value.html">
+
+<polymer-element
+    name="collaborative-map-item"
+    extends="base-collaborative-item">
+  <template>
+    <div id="item">
+      <div class="key-actions">
+        <shadow></shadow>
+        <editable-cell id="editableKey"></editable-cell>
+      </div>
+      <div id="value"></div>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      keyChanged: function() {
+        this.$.editableKey.data = {
+          type: 'key',
+          value: this.key,
+          parent: this.parent
+        }
+      },
+
+      clear: function() {
+        var children = this.$.value.children;
+        for (var i = 0; i < children.length; i++) {
+          this.$.value.removeChild(children[i]);
+        }
+      }
+    });
+  </script>
+</polymer-element>

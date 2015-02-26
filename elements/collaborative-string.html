@@ -1,0 +1,61 @@
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="base-collaborative-element.html">
+<link rel="import" href="editable-cell.html">
+
+<polymer-element
+  name="collaborative-string"
+  attributes="value parent"
+  extends="base-collaborative-element">
+  <template>
+    <shadow></shadow>
+    <div id="content" hidden?="{{ contentHidden }}">
+      <editable-cell id="editableCell"></editable-cell>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      ready: function() {
+        this.super();
+        this.elementName = 'Collaborative String';
+      },
+
+      create: function() {
+        this.super();
+        this.$.editableCell.data = {
+          value: this.value.getText(),
+          parent: this
+        }
+      },
+
+      update: function(evt) {
+        if(evt.isLocal){
+          return;
+        }
+
+        var string = this.$.editableCell.data.value;
+
+        switch (evt.type) {
+
+          // Insert new text at index
+          case gapi.drive.realtime.EventType.TEXT_INSERTED:
+            this.$.editableCell.data.value =
+              string.substring(0, evt.index) + evt.text +
+              string.substring(evt.index);
+            break;
+
+          // Remove text from string
+          case gapi.drive.realtime.EventType.TEXT_DELETED:
+            this.$.editableCell.data.value =
+              string.slice(0, evt.index) +
+              string.slice(evt.index + evt.text.length, string.length);
+            break;
+        }
+
+      },
+
+      set: function(data) {
+        this.value.setText(data.value);
+      }
+    });
+  </script>
+</polymer-element>

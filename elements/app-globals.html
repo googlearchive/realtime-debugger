@@ -1,0 +1,64 @@
+<link rel="import" href="../components/polymer/polymer.html">
+
+<polymer-element name="app-globals">
+  <script src="../js/DocumentHolder.js"></script>
+  <script src="../js/MessagePoster.js"></script>
+  <script>
+    (function(DocumentHolder, MessagePoster) {
+
+      var documentHolder = new DocumentHolder;
+      var messenger = new MessagePoster;
+      var picker = new Object;
+
+      Polymer({
+        COLLABORATOR_DISPLAY: 'collaborator-display',
+
+        COLLABORATIVE_DOCUMENT: 'collaborative-document',
+
+        COLLABORATIVE_LIST: 'collaborative-list',
+
+        COLLABORATIVE_LIST_ITEM: 'collaborative-list-item',
+
+        COLLABORATIVE_MAP: 'collaborative-map',
+
+        COLLABORATIVE_MAP_ITEM: 'collaborative-map-item',
+
+        COLLABORATIVE_STRING: 'collaborative-string',
+
+        INDEX_REFERENCE: 'index-reference',
+
+        JSON_VALUE: 'json-value',
+
+        VALUE_PICKER: 'value-picker',
+
+        ready: function() {
+          this.documentHolder = documentHolder;
+          this.messenger = messenger;
+          this.picker = picker;
+        },
+
+        addDoc: function(fileId, doc) {
+          this.documentHolder.addDoc(fileId, doc);
+        },
+
+        getDoc: function(fileId) {
+          return this.documentHolder.getDoc(fileId);
+        },
+
+        getModel: function(fileId) {
+          return this.getDoc(fileId).getModel();
+        },
+
+        // Singleton for the value-picker element
+        getPicker: function () {
+          return this.picker.self;
+        },
+
+        setPicker: function(picker) {
+          this.picker.self = picker;
+        }
+      });
+
+    })(DocumentHolder, MessagePoster);
+  </script>
+</polymer-element>

@@ -1,0 +1,102 @@
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="app-settings.html">
+<link rel="import" href="base-debugger-element.html">
+<link rel="import" href="collaborative-document.html">
+<link rel="import" href="value-picker.html">
+<link rel="import" href="event-viewer.html">
+
+<polymer-element
+    name="debug-app"
+    extends="base-debugger-element">
+  <template>
+    <app-settings id="settings" fileId="{{ fileIds }}"></app-settings>
+    <div id="docs"></div>
+    <event-viewer id="events"></event-viewer>
+    <value-picker></value-picker>
+  </template>
+  <script>
+    Polymer({
+      ready: function() {
+        this.super();
+        this.onMessageReceive = this.onMessageReceive.bind(this);
+        window.addEventListener('message', this.onMessageReceive);
+        this.globals.setPicker(this.shadowRoot.querySelector('value-picker'));
+      },
+
+      /**
+       * Wait for an authentication token from parent window before
+       * starting the application
+       */
+      onMessageReceive: function(event) {
+        if (event.data.token) {
+          this.token = event.data.token;
+          this.globals.messenger.targetOrigin = event.data.origin;
+          this.startApp();
+        }
+      },
+
+      /**
+       * Start the application
+       */
+      startApp: function() {
+        this.fileIds = this.getParam('ids');
+        this.$.settings.configureParentWindow();
+        if (!this.fileIds) {
+          return;
+        }
+
+        var splitIds = this.fileIds.split(',');
+        var that = this;
+
+        window.gapi.load('auth:client,drive-realtime,drive-share', {
+          callback:  function() {
+            gapi.auth.setToken({ access_token: that.token});
+
+            // Load each file
+            for (var i = 0; i < splitIds.length; i++) {
+              that.loadFile(splitIds[i]);
+            }
+          }
+        });
+      },
+
+      loadFile: function(fileId) {
+        var that = this;
+        window.gapi.drive.realtime.load(
+          fileId,
+          function (doc) {
+            that.onFileLoaded(fileId, doc)
+          },
+          function() {},
+          function(e) {}
+        );
+      },
+
+      onFileLoaded: function (fileId, doc) {
+        var docEl = document.createElement(
+          this.globals.COLLABORATIVE_DOCUMENT);
+        this.globals.addDoc(fileId, doc);
+        docEl.doc = doc;
+        docEl.fileId = fileId;
+        docEl.token = this.token;
+        docEl.eventViewer = this.$.events;
+        this.$.docs.appendChild(docEl);
+      },
+
+      /**
+       * Utility function that retrieves the value of a url parameter.
+       */
+      getParam: function(param) {
+        var regExp = new RegExp(param + '=(.*?)($|&)', 'g');
+        var match = window.location.search.match(regExp);
+        if (match && match.length) {
+          match = match[0];
+          match = match.replace(param + '=','').replace('&','');
+        } else {
+          match = null;
+        }
+        return match;
+      }
+    });
+  </script>
+</polymer-element>

@@ -1,0 +1,85 @@
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="../components/core-ajax/core-ajax.html">
+<link rel="import" href="collaborative-map.html">
+<link rel="import" href="collaborator-display.html">
+<link rel="import" href="base-debugger-element.html">
+
+<polymer-element
+    name="collaborative-document"
+    attributes="doc fileId token"
+    extends="base-debugger-element">
+  <template>
+    <core-ajax
+      id="driveFileMetadataRequest"
+      url="{{ documentTitleBaseUrl }}/drive/v2/files/{{ fileId }}"
+      headers='{"Authorization": "Bearer {{ token }}"}'
+      params='{}'
+      handleAs="json"
+      on-core-response="{{ handleResponse }}">
+    </core-ajax>
+    <meta-element id="meta"></meta-element>
+    <div id="content" hidden?="{{ contentHidden }}">
+      <collaborator-display id="collaborators"></collaborator-display>
+      <collaborative-map id="mapEl" fileId="{{ fileId }}"></collaborative-map>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      ready: function() {
+        this.super();
+        this.onCollaboratorChanged = this.onCollaboratorChanged.bind(this);
+        this.onRootObjectChanged = this.onRootObjectChanged.bind(this);
+        this.documentTitleBaseUrl = 'https://www.googleapis.com';
+        this.contentHidden = true;
+        this.$.meta.parent = this;
+      },
+
+      docChanged: function() {
+        this.$.mapEl.value = this.doc.getModel().getRoot();
+        this.$.mapEl.parent = this;
+        this.$.collaborators.collaborators = this.doc.getCollaborators();
+        this.readonly = this.doc.getModel().isReadOnly;
+        this.title = "fetching...";
+        this.doc.addEventListener(
+          gapi.drive.realtime.EventType.COLLABORATOR_JOINED,
+          this.onCollaboratorChanged);
+        this.doc.addEventListener(
+          gapi.drive.realtime.EventType.COLLABORATOR_LEFT,
+          this.onCollaboratorChanged);
+        this.doc.getModel().getRoot().addEventListener(
+          gapi.drive.realtime.EventType.OBJECT_CHANGED,
+          this.onRootObjectChanged);
+        this.setMetadata();
+      },
+
+      setMetadata: function() {
+        this.$.meta.metadata = "p:Collaborative Document" +
+          "t: id=\"s:" + this.fileId + "t:\"" +
+          "t: title=\"s:" + this.title + "t:\"" +
+          "t: readonly=\"s:" + this.readonly + "t:\"";
+      },
+
+      /**
+       * Fetch the document title from Drive.
+       */
+      tokenChanged: function() {
+        this.$.driveFileMetadataRequest.go();
+      },
+
+      onCollaboratorChanged: function() {
+        this.$.collaborators.collaborators = this.doc.getCollaborators();
+      },
+
+      onRootObjectChanged: function(evt) {        var events = evt.events;
+        for (var i = 0; i < events.length; i++) {
+          this.eventViewer.addEvent(events[i]);
+        }
+      },
+
+      handleResponse: function(evt, resp) {
+        this.title = resp.response.title;
+        this.setMetadata();
+      }
+    });
+  </script>
+</polymer-element>
